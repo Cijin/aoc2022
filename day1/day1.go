@@ -7,14 +7,14 @@ import (
 	"strings"
 )
 
-func parseCalories(lines []string) ([][]int, error) {
-	var out [][]int
-	var temp []int
+func parseCalories(lines []string) ([]int, error) {
+	var out []int
+	var temp int
 
 	for i, line := range lines {
 		if line == "" || i+1 == len(lines) {
 			out = append(out, temp)
-			temp = nil
+			temp = 0
 			continue
 		}
 
@@ -23,13 +23,17 @@ func parseCalories(lines []string) ([][]int, error) {
 			return nil, err
 		}
 
-		temp = append(temp, num)
+		temp += num
 	}
+
+	sort.Slice(out, func(i, j int) bool {
+		return out[i] > out[j]
+	})
 
 	return out, nil
 }
 
-func getInput() ([][]int, error) {
+func getSortedTotalCalories() ([]int, error) {
 	data, err := os.ReadFile("day1/calories.txt")
 	if err != nil {
 		return nil, err
@@ -39,24 +43,4 @@ func getInput() ([][]int, error) {
 	lines := strings.Split(string(data), "\n")
 
 	return parseCalories(lines)
-}
-
-func sortedTotalCalories(pack [][]int) []int {
-	var curr int
-	var totals []int
-
-	for _, calories := range pack {
-		for _, c := range calories {
-			curr += c
-		}
-
-		totals = append(totals, curr)
-		curr = 0
-	}
-
-	sort.Slice(totals, func(i, j int) bool {
-		return totals[i] > totals[j]
-	})
-
-	return totals
 }
